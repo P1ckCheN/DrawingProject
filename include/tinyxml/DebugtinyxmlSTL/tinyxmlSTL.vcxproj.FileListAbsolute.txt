@@ -1,0 +1,1 @@
+C:\Users\84956\Desktop\DrawingProject\include\tinyxml\DebugtinyxmlSTL\tinyxmlSTL.lib

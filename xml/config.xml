@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configure>
+  <color_configure>
+    <color>
+      <name>Red</name>
+      <value>(255,0,0)</value>
+    </color>
+    <color>
+      <name>Green</name>
+      <value>(0,255,0)</value>
+    </color>
+    <color>  
+      <name>Blue</name>
+      <value>(0,0,255)</value>
+    </color>
+    
+  </color_configure>
+  <linewidth_configure>
+    <linewidth>
+      <name>Thin</name>
+      <value>3</value>
+    </linewidth>
+    <linewidth>
+      <name>Medium</name>
+      <value>9</value>
+    </linewidth>
+    <linewidth>
+      <name>Thick</name>
+      <value>15</value>
+    </linewidth>
+  </linewidth_configure>
+</configure>
