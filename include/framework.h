@@ -25,7 +25,10 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+// C++ 运行时头文件
 #include <string>
 #include <iostream>
+#include <vector>
 
 #endif
