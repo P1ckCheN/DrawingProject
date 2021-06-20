@@ -13,6 +13,7 @@
 #define PARSINGXML_H__
 
 #include "framework.h"
+#include "freepainting.h"
 #include "tinyxml/tinyxml.h"
 
 void Transform(int* color_value, std::string& color_value_string);
