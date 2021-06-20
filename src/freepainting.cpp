@@ -120,6 +120,11 @@ void SaveDrawing(HWND hwnd, HDC hdc, POINT ptBegin, POINT ptEnd,
 	
 }
 
+void ClearDrawing(std::vector<DrawParm>& draw_parm)
+{
+	draw_parm.clear();
+	return;
+}
 /**
  * @brief 消息回调函数
  */
@@ -128,6 +133,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	PAINTSTRUCT ps;
 	int wmId, wmEvent;
+	static int flag_clear = false;
 	static POINT ptShapeBegin, ptShapeEnd;
 
 	static ShapeParm type_shape;								///< 默认形状：直线
@@ -152,17 +158,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
-		SaveDrawing(hwnd, hdc, ptShapeBegin, ptShapeEnd, draw_parm, type_shape, type_color, type_linewidth);
+		if (flag_clear == false)
+		{
+			SaveDrawing(hwnd, hdc, ptShapeBegin, ptShapeEnd, draw_parm, type_shape, type_color, type_linewidth);
+		}
+		else
+		{
+			RECT rect;
+			GetClientRect(hwnd, &rect);
+			DrawText(hdc, TEXT("Please move leftbutton to draw, click rightbutton to erase!"), 59, &rect, DT_CENTER | DT_SINGLELINE);
+			ClearDrawing(draw_parm);
+			flag_clear = false;
+		}
 		EndPaint(hwnd, &ps);
 		return 0;
-	/*case WM_RBUTTONDOWN:
-		hdc = GetDC(hwnd);
-		GetClientRect(hwnd, &rect);
-		ReleaseDC(hwnd, hdc);
-		InvalidateRect(hwnd, NULL, true);
+	case WM_RBUTTONDOWN:
+		flag_clear = true;
 		return 0;
 	case WM_RBUTTONUP:
-		return 0;*/
+		InvalidateRect(hwnd, NULL, TRUE);
+		return 0;
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
