@@ -50,13 +50,13 @@ int ReadXmlFile(int in_color, int in_linewidth, int* out_color, int* out_linewid
 	std::string in_linewidthstr;
 	switch (in_color)
 	{
-	case 3:
+	case ColorParm::TYPE_RED:
 		in_colorstr = "Red";
 		break;
-	case 4:
+	case ColorParm::TYPE_BLUE:
 		in_colorstr = "Blue";
 		break;
-	case 5:
+	case ColorParm::TYPE_GREEN:
 		in_colorstr = "Green";
 		break;
 	default:
@@ -65,13 +65,13 @@ int ReadXmlFile(int in_color, int in_linewidth, int* out_color, int* out_linewid
 	}
 	switch (in_linewidth)
 	{
-	case 6:
+	case LinewidthParm::TYPE_THIN:
 		in_linewidthstr = "Thin";
 		break;
-	case 7:
+	case LinewidthParm::TYPE_MEDIUM:
 		in_linewidthstr = "Medium";
 		break;
-	case 8:
+	case LinewidthParm::TYPE_THICK:
 		in_linewidthstr = "Thick";
 		break;
 	default:
