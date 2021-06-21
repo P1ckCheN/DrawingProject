@@ -21,14 +21,19 @@
 #include <windows.h>
 
 // C 运行时头文件
+#include <process.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
 
 // C++ 运行时头文件
-#include <string>
 #include <iostream>
+#include <string>
 #include <vector>
+#include <unordered_map>
+
+// 自定义头文件
+#include "errorhandle.h"
 
 #endif
