@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\errorhandle.h" />
     <ClInclude Include="include\freepainting.h" />
     <ClInclude Include="include\framework.h" />
     <ClInclude Include="include\parsingxml.h" />
@@ -158,6 +159,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\errorhandle.cpp" />
     <ClCompile Include="src\freepainting.cpp" />
     <ClCompile Include="src\parsingxml.cpp" />
   </ItemGroup>

@@ -30,6 +30,9 @@
     <ClInclude Include="include\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\errorhandle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DrawingProject.rc">
@@ -49,6 +52,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\freepainting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\errorhandle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
