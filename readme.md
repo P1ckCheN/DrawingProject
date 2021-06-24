@@ -1,4 +1,4 @@
-# FreePaintingTools v2.0
+# FreePaintingTools v2.2
 
 ## Functions：
 1. Draw different shapes include **line**, **rectangle** and **ellipse**.
@@ -25,17 +25,24 @@
 - Click right button to erase the board.
 - Have a good time!
 
-## History version
- ### version 1
- -  version 1.1   
- (1) fix the problem of ***coordinate deviation***;
- (2) fix the problem which will cause painting erased when zoom in or out the program window.
- - version 1.2
- (1) change the way of showing text box;
- (2) only draw ***contour*** instead of fill the rectangle or ellipse.
+## Version Update Record
+ ### Version 1
+ ####  1.1   
+ - Fix the problem of ***coordinate deviation***;
+ - Fix the problem which will cause painting erased when zoom in or out the program window.
+ #### 1.2
+ - Change the way of showing text box;
+ - Only draw ***contour*** instead of fill the rectangle or ellipse.
 
 ### version 2
- - version 2.0
- (1) use ***multi-thread*** way to read and parse xml files, you can change the file content while run this program!
- (2) add ***message-boxs*** to popup error;
- (3) add several kind of error code.
+#### 2.0
+- Use ***multi-thread*** way to read and parse xml files, you can change the file content while run this program!
+- Add ***message-boxs*** to popup error;
+- Add several kind of error code.
+
+#### 2.1
+- Add ***Drawing board*** class cater to C++;
+- Add multi-thread synchronization ways of atomic.
+#### 2.2
+- Introduce database and cache tech;
+- Use ***Cache*** class to simulate database&cache.
