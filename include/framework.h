@@ -31,9 +31,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <atomic>
 #include <unordered_map>
 
 // 自定义头文件
+#include "tinyxml/tinyxml.h"
+#include "freepainting.h"
 #include "errorhandle.h"
+#include "parsingxml.h"
 
 #endif

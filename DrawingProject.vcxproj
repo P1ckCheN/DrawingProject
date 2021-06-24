@@ -147,7 +147,6 @@
     <ClInclude Include="include\errorhandle.h" />
     <ClInclude Include="include\freepainting.h" />
     <ClInclude Include="include\framework.h" />
-    <ClInclude Include="include\parsingxml.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\targetver.h" />
   </ItemGroup>
