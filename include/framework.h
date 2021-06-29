@@ -12,7 +12,7 @@
 #ifndef FRAMEWORK_H__
 #define FRAMEWORK_H__
 
-#include "targetver.h"
+
 
 // 从 Windows 头文件中排除极少使用的内容
 #define WIN32_LEAN_AND_MEAN             
@@ -21,25 +21,28 @@
 #include <windows.h>
 
 // C 运行时头文件
-#include <process.h>
+#include <tchar.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
-#include <tchar.h>
+#include <process.h>
 
 // C++ 运行时头文件
-#include <iostream>
+#include <mutex>
 #include <string>
 #include <vector>
 #include <thread>
-#include <mutex>
 #include <atomic>
+#include <iostream>
 #include <unordered_map>
 
 // 自定义头文件
-#include "tinyxml/tinyxml.h"
-#include "freepainting.h"
-#include "errorhandle.h"
+#include "Resource.h"
+#include "targetver.h"
 #include "parsingxml.h"
+#include "errorhandle.h"
+#include "freepainting.h"
+#include "paintingstruct.h"
+#include "tinyxml/tinyxml.h"
 
 #endif

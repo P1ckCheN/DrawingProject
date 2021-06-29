@@ -1,6 +1,6 @@
 /**
  * \file freepainting.cpp
- * \brief 程序入口
+ * \brief 窗体程序入口
  *
  * 主程序
  * v1.1 2021.6.19
@@ -24,12 +24,15 @@
  * 
  * v2.2 2021.6.23
  * (1) 添加数据存储类
- * (1) 增设数据库 + 缓存 Cache Aside Pattern 方法
+ * (2) 增设数据库 + 缓存 Cache Aside Pattern 方法
  * 读的时候，先读缓存;
  * 如果没有缓存, 读数据库, 取出数据放入缓存, 同时返回响应;
  * 更新的时候, 先更新数据库, 再删除缓存
-
+ * (3) RCU方法？
  * 
+ * v2.3 2021.6.29
+ * (1) 解决使用子线程先于多线程退出问题
+ * (2) 出现CPU占用高or阻塞严重的二选一问题
  * \author 陈瑞佳
  * \version 2.2
  * \date 2021/06/24
@@ -37,7 +40,14 @@
 
 #include "freepainting.h"
 
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+ // 全局变量；
+ // 不可以放在头文件中，会造成重复包含；
+static bool			main_thread_exit = false;							///< 主线程退出标志
+static POINT		point_curr_begin;									///< 起始点
+static POINT		point_curr_end;										///< 终止点
+static Cache		color_linewidth_cache;								///< 缓存
+static Cache		color_linewidth_database;							///< 数据库
+static DrawingBoard board;												///< 画板对象
 
 /**
  * @brief WIN32窗口主程序
@@ -48,14 +58,18 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
  */
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR szCmdLine, _In_ int iCmdShow)
 {
-	static TCHAR szAppName[] = TEXT("FreePainting");
-	HWND hwnd;
 	MSG msg;
-	static HBRUSH hBrush;
+	HWND hwnd;
 	WNDCLASS wndclass;
-	// 开启读取文件的线程
-	std::thread thread_read_xml_file(ThreadReadXmlFile, std::ref(board));
-	thread_read_xml_file.detach();
+	static HBRUSH hBrush;
+	static TCHAR szAppName[] = TEXT("FreePainting");
+
+	// 开启读取文件的线程, 1.win32 方法，2.C++11 thread库
+	HANDLE thread_h;
+	unsigned thread_id;
+	thread_h = (HANDLE)_beginthreadex(NULL, 0, ThreadReadXmlFile, NULL, 0, &thread_id);
+	//std::thread thread_read_xml_file(ThreadReadXmlFile, std::ref(board));
+	//thread_read_xml_file.detach();
 	
 	LoadMenu(hInstance, TEXT("Menu"));
 	hBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
@@ -89,58 +103,45 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	return msg.wParam;
-}
+	WaitForSingleObject(thread_h, INFINITE);
+	CloseHandle(thread_h);
+	return msg.wParam;	
+} 
 
 /**
- * @brief DrawingBoard类，析构函数
+ * @brie 多线程读取文件
+ * @param [in] p_parm						参数指针
  */
-DrawingBoard::~DrawingBoard()
+unsigned int WINAPI ThreadReadXmlFile(void *p_parm)
 {
-	drawing_parm.clear();
+	while (true && !main_thread_exit)
+	{
+		// CPU占用高
+		/*ErrorShow(ReadXmlFile(board, color_linewidth_database, color_linewidth_cache));
+		for (int i = 0; i < 10; ++i)
+		{
+			if (main_thread_exit)
+			{
+				return 0;
+			}
+			Sleep(1000);
+		}*/
+
+		// 响应慢
+		ErrorShow(ReadXmlFile(board, color_linewidth_database, color_linewidth_cache));
+		Sleep(10*1000);
+	}
+	return 0;
 }
 
 /**
- * @brief Cache类，构造函数
- * 初始化
+ * @brief DrawingBoard类：画图函数
+ * @param [in] hwnd							窗体句柄
+ * @param [in] hdc							图像设备描述表
+ * @param [in] color_linewidth_database		数据库
+ * @param [in] color_linewidth_cache		缓存
  */
-Cache::Cache()
-{
-	state = DataState::NO_UPDATE;
-	color_cache.clear();
-	color_cache.clear();
-}
-
-/**
- * @brief Cache类, 构造函数
- * 初始化
- */
-void Cache::deletecache()
-{
-	state = DataState::DELETED;
-	color_cache.clear();
-	linewidth_cache.clear();
-}
-
-/**
- * @brief Cache类, 拷贝构造函数
- * 相比于默认拷贝构造,因为只需要数据->缓存
- * 所以不拷贝状态
- * 初始化
- */
-Cache& Cache::operator=(const Cache& cache)
-{
-	color_cache = cache.color_cache;
-	linewidth_cache = cache.linewidth_cache;
-	return *this;
-}
-
-/**
- * @brief DrawingBoard类, 画图函数
- * @param [in] hwnd				窗体句柄
- * @param [in] hdc				图像设备描述表
- */
-void DrawingBoard::Drawing(HWND hwnd, HDC hdc)
+void DrawingBoard::Drawing(HWND hwnd, HDC hdc, Cache& color_linewidth_database, Cache& color_linewidth_cache)
 {
 	RECT rect;
 	HPEN hpen;
@@ -160,19 +161,20 @@ void DrawingBoard::Drawing(HWND hwnd, HDC hdc)
 		color_linewidth_cache = color_linewidth_database;
 		color_linewidth_cache.state = DataState::UPDATEED;
 	}
-	
+
 	// 使用缓存数据参数绘图
-	ErrorShow(ParsingDataCache(type_color, type_linewidth, color, linewidth, color_linewidth_cache.color_cache , color_linewidth_cache.linewidth_cache));
+
+	ErrorShow(ParsingDataCache(type_color, type_linewidth, color, linewidth, color_linewidth_cache.color_cache, color_linewidth_cache.linewidth_cache));
 
 	// 下面为之前版本的原子实现
 	//if (flag_read_xml_file)
 		//ErrorShow(ParsingDataAtomic(type_color, type_linewidth, color, linewidth, color_cache_thread, linewidth_cache_thread));
-	
+
 	DrawingParm curr_parm;
 	curr_parm.point_begin = point_begin;
 	curr_parm.point_end = point_end;
 	curr_parm.shape_parm = type_shape;
-	curr_parm.color_parm = {color[0], color[1], color[2]};
+	curr_parm.color_parm = { color[0], color[1], color[2] };
 	curr_parm.linewidth_parm = linewidth;
 
 	drawing_parm.emplace_back(curr_parm); // 保存历史绘图
@@ -203,31 +205,6 @@ void DrawingBoard::Drawing(HWND hwnd, HDC hdc)
 }
 
 /**
- * @brief DrawingBoard类,清除屏幕
- * 右键清屏实现
- */
-void DrawingBoard::ClearDrawing()
-{
-	flag_clear = false;
-	drawing_parm.clear();
-	return;
-}
-
-/**
- * @brie 多线程读取文件
- * @param [in] board			画板对象
- */
-
-void ThreadReadXmlFile(DrawingBoard& board)
-{
-	while (true)
-	{
-		ErrorShow(ReadXmlFile(board));
-		Sleep(10 * 1000);
-	}
-}
-
-/**
  * @brief 消息回调函数
  * @param [in] hwnd				窗体句柄
  * @param [in] message			消息常量标识符
@@ -243,25 +220,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CREATE:
-		//_beginthread(ThreadReadXmlFile, 0, NULL);	std::thread thread_read_xml_file(ThreadReadXmlFile);
 		return 0;
 	case WM_LBUTTONDOWN:
 		point_curr_begin.x = LOWORD(lParam);
 		point_curr_begin.y   = HIWORD(lParam);
-		//GetCursorPos(&ptShapeBegin); //获取坐标不准确
 		return 0;
 	case WM_LBUTTONUP:
 		point_curr_end.x = LOWORD(lParam);
 		point_curr_end.y   = HIWORD(lParam);
-		//GetCursorPos(&ptShapeEnd); //获取坐标不准确
-		InvalidateRect(hwnd, NULL, TRUE); //关键，使区域无效化，可以调用WM_PAINT函数，不然画不出来
+		InvalidateRect(hwnd, NULL, TRUE);		//关键，使区域无效化，进入WM_PAINT函数，不然画不出来
 		return 0;
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		if (board.GetClear() == false)
 		{
 			board.SetCurrPoint(point_curr_begin, point_curr_end);
-			board.Drawing(hwnd, hdc);
+			board.Drawing(hwnd, hdc, color_linewidth_database, color_linewidth_cache);
 		}
 		else
 		{
@@ -316,89 +290,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 	case WM_DESTROY:
-		//_endthread(); // 线程退出代码？
+		main_thread_exit = true;
 		PostQuitMessage(0);
 		return 0;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-/**
- * @brief 读取XML文件
- * version 2.2 
- * 采用数据库+缓存形式
- * @param [in]  board		画板对象
- * @param [out] board		画板对象
- */
-int ReadXmlFile(DrawingBoard& board)
-{
-	// 先更新数据库
-	color_linewidth_database.state = DataState::NO_UPDATE;
 
-	std::string color_value_string;
-	std::string linewidth_value_string;
-	int* color_transform = new int[3];
-
-	//打开文件
-	TiXmlDocument doc;
-	if (!doc.LoadFile("xml/config.xml"))
-	{
-		return ERROR_XML_PATH;
-	}
-	TiXmlElement* xml_configure = doc.RootElement();
-	if (!xml_configure)
-	{
-		return ERROR_XML_CONFIGURE;
-	}
-	TiXmlElement* xml_color_configure = xml_configure->FirstChildElement("color_configure");
-	TiXmlElement* xml_linewidth_configure = xml_color_configure->NextSiblingElement("linewidth_configure");
-
-	bool flag_get_color = 0;
-	bool flag_get_linewidth = 0;
-
-	// 将颜色存入数据库
-	TiXmlElement* xml_color = xml_color_configure->FirstChildElement("color");
-	while (xml_color != nullptr)
-	{
-		TiXmlElement* xml_color_name = xml_color->FirstChildElement("name");
-		std::string s = xml_color_name->GetText();
-
-		color_value_string = xml_color_name->NextSiblingElement("value")->GetText();
-		Transform(color_transform, color_value_string);
-
-		color_linewidth_database.color_cache[s] = new int[3];
-		for (int i = 0; i < 3; i++)
-		{
-			color_linewidth_database.color_cache[s][i] = color_transform[i];
-		}
-
-		xml_color = xml_color->NextSiblingElement();
-	}
-
-	// 将线条存入数据库
-	TiXmlElement* xml_linewidth = xml_linewidth_configure->FirstChildElement("linewidth");
-	while (xml_linewidth != nullptr)
-	{
-		TiXmlElement* xml_linewidth_name = xml_linewidth->FirstChildElement("name");
-		std::string s = xml_linewidth_name->GetText();
-		color_linewidth_database.linewidth_cache[s] = std::stoi(xml_linewidth_name->NextSiblingElement("value")->GetText());
-		xml_linewidth = xml_linewidth->NextSiblingElement();
-	}
-
-	// 异常判断
-	if (color_linewidth_database.color_cache.empty())
-	{
-		return ERROR_EMPTY_COLOR;
-	}
-	if (color_linewidth_database.linewidth_cache.empty())
-	{
-		return ERROR_EMPTY_LINEWIDTH;
-	}
-
-	//数据库已更新
-	color_linewidth_database.state = DataState::UPDATEED;
-	// 删除缓存
-	color_linewidth_cache.deletecache();
-	board.SetRead(true);
-	return SUCCESS;
-}

@@ -30,6 +30,12 @@
     <ClInclude Include="include\errorhandle.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\parsingxml.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\paintingstruct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DrawingProject.rc">
@@ -52,6 +58,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\errorhandle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\paintingstruct.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
