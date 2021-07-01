@@ -151,7 +151,6 @@
     <ClInclude Include="include\paintingstruct.h" />
     <ClInclude Include="include\parsingxml.h" />
     <ClInclude Include="include\Resource.h" />
-    <ClInclude Include="include\targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DrawingProject.rc" />

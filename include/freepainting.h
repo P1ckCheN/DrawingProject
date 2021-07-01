@@ -1,37 +1,37 @@
-/**
- * \file freepainting.h
- * \brief 主程序头文件
- *
- * 定义结构体变量和全局变量
- *
- * \author 陈瑞佳
- * \version 2.2
- * \date 2021/06/24
- */
-
+// @brief: main file function declaration
+// @copyright: Copyright 2021 by Buckychen. All rights reserved
+// @birth: created by Buckychen on 2021-06-12
+// @version: v2.3
+// @reversion: last revised by Buckychen on 2021-07-01
 #ifndef FREEPAINTING_H__
 #define FREEPAINTING_H__
 
-#include "framework.h"			// 相关头文件
+// related head files
+#include "framework.h"      
 
-#include <windows.h>			// C库
+// C lib
+#include <windows.h>    
 #include <process.h>
 
-#include <string>				// C++库
+// C++ lib
+#include <string> 
 #include <vector>
 #include <atomic>
 #include <unordered_map>
 
-#include "tinyxml/tinyxml.h"	// 其他库的.h
+// other lib 
+#include "tinyxml/tinyxml.h" 
 
-#include "Resource.h"			// 本项目内的.h
+// within this project
+#include "Resource.h" 
 #include "parsingxml.h"
 #include "errorhandle.h"
 #include "freepainting.h"
 #include "paintingstruct.h"
-	
-// 函数声明
-unsigned int WINAPI ThreadReadXmlFile(void* p_parm);
+  
+#define TIMER_READ_ID  1      // timer id
+
+unsigned int WINAPI ThreadReadXmlFile(void* pointer_parm);
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 

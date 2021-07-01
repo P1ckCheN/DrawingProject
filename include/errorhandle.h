@@ -1,27 +1,23 @@
-/**
- * \file errorhandle.h
- * \brief 异常处理头文件
- *
- * 定义异常编号
- *
- * \author 陈瑞佳
- * \version 1.0
- * \date 2021/06/21
- */
+// @brief: define error code 
+// @copyright: Copyright 2021 by Buckychen. All rights reserved
+// @birth: created by Buckychen on 2021-06-12
+// @version: v2.3
+// @reversion: last revised by Buckychen on 2021-06-30
 
 #include <windows.h>
 
 #ifndef ERRORHANDLE_H__
 #define ERRORHANDLE_H__
 
-#define SUCCESS					0		///< 成功返回	
-#define ERROR_XML_PATH			1		///< 路径错误
-#define ERROR_XML_CONFIGURE		2		///< 配置信息错误
-#define ERROR_EMPTY_COLOR		3		///< 无法读取色彩信息
-#define ERROR_EMPTY_LINEWIDTH	4		///< 无法读取线条宽度信息	
-#define ERROR_PARSING_DATA		5		///< 解析文件错误
-#define ERROR_REGISTER_CLASS	6		///< 注册窗口错误
+#define SUCCESS          0    
+#define ERROR_XML_PATH      1    
+#define ERROR_XML_CONFIGURE    2    
+#define ERROR_EMPTY_COLOR    3   
+#define ERROR_EMPTY_LINEWIDTH  4  
+#define ERROR_PARSING_DATA    5   
+#define ERROR_REGISTER_CLASS  6    
+#define ERROR_HANDLE_TIME    7    
 
-VOID ErrorShow(int error_code);
+void ErrorShow(int error_code);
 
 #endif // !ERRORHANDLE_H__

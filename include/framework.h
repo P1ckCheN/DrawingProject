@@ -1,13 +1,8 @@
-﻿/**
- * \file framework.h
- * \brief 标准系统包含文件的包含文件，或特定于项目的包含文件
- *
- * 主程序
- *
- * \author 陈瑞佳
- * \version 1.0
- * \date 2021/06/17
- */
+﻿// @brief: include files
+// @copyright: Copyright 2021 by Buckychen. All rights reserved
+// @birth: created by Buckychen on 2021-06-12
+// @version: v2.3
+// @reversion: last revised by Buckychen on 2021-06-30
 
 #ifndef FRAMEWORK_H__
 #define FRAMEWORK_H__
@@ -38,7 +33,7 @@
 
 // 自定义头文件
 #include "Resource.h"
-#include "targetver.h"
+//#include "targetver.h"
 #include "parsingxml.h"
 #include "errorhandle.h"
 #include "freepainting.h"

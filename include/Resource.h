@@ -1,15 +1,8 @@
-/**
- * \file Resource.h
- * \brief 资源文件
- *
- * {{NO_DEPENDENCIES}}
- * Microsoft Visual C++ 生成的包含文件。
- * 供 DrawingProject.rc 使用
- *
- * \author 陈瑞佳
- * \version 1.0
- * \date 2021/06/17
- */
+// @brief: resource file
+// @copyright: Copyright 2021 by Buckychen. All rights reserved
+// @birth: created by Buckychen on 2021-06-12
+// @version: v2.3
+// @reversion: last revised by Buckychen on 2021-06-30
 
 #ifndef RESOURCE_H__
 #define RESOURCE_H__
