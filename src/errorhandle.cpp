@@ -1,8 +1,8 @@
 // @brief: error code display
 // @copyright: Copyright 2021 by Buckychen. All rights reserved
 // @birth: created by Buckychen on 2021-06-12
-// @version: v2.3
-// @reversion: last revised by Buckychen on 2021-06-30
+// @version: v2.5
+// @reversion: last revised by Buckychen on 2021-07-01
 
 #include "errorhandle.h"
 
@@ -39,6 +39,10 @@ void ErrorShow(int error_code)
       break;
     case ERROR_HANDLE_TIME:
       MessageBox(NULL, TEXT("Time out, Please check the program!"),
+        szAppName, MB_ICONERROR);
+      break;
+    case ERROR_HANDLE_WAITOBJECT:
+      MessageBox(NULL, TEXT("Get event failed, please check the event handle!"),
         szAppName, MB_ICONERROR);
       break;
     default:

@@ -1,7 +1,7 @@
 // @brief: class declaration
 // @copyright: Copyright 2021 by Buckychen. All rights reserved
 // @birth: created by Buckychen on 2021-06-12
-// @version: v2.3
+// @version: v2.5
 // @reversion: last revised by Buckychen on 2021-06-30
 
 #ifndef PAINTINGSTRUCT_H__
@@ -76,7 +76,7 @@ public:
 //  board.SetColor(ColorParm::TYPE_RED);
 //  board.SetLinewidthParm(LinewidhtParm::TYPE_THIN);
 //  board.ClearDrawing();
-//  Cache color_linewidth_cache, color_linewidth_database;
+//  Cache board.color_linewidth_cache, board.color_linewidth_database;
 //  ...
 //  board.Drawing(hwnd, hdc, database, cache);
 class DrawingBoard {
@@ -93,6 +93,13 @@ private:
   std::vector<DrawingParm> drawing_parm;   
 
 public:
+  POINT point_curr_begin;
+  POINT point_curr_end;
+  Cache color_linewidth_cache;
+  Cache color_linewidth_database;
+  HANDLE read_and_exit_handle[2];
+
+public:
   DrawingBoard();
   ~DrawingBoard();
   void ClearDrawing();
@@ -104,11 +111,11 @@ public:
   inline void SetLinewidth(LinewidthParm linewidth) { 
     type_linewidth = linewidth; 
   }
-  inline void SetCurrPoint(POINT point_curr_begin, POINT point_curr_end) {
+  inline void SetCurrPoint() {
     point_begin = point_curr_begin;
     point_end = point_curr_end;
   }
-  void Drawing(HWND hwnd, HDC hdc, Cache& color_linewidth_database, Cache& color_linewidth_cache);
+  void Drawing(HWND hwnd, HDC hdc);
 };
 
 #endif // ! PAINTINGSTRUCT_H__

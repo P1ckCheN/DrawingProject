@@ -1,18 +1,12 @@
 // @brief: main file
 // @copyright: Copyright 2021 by Buckychen. All rights reserved
 // @birth: created by Buckychen on 2021-06-12
-// @version: v2.4
+// @version: v2.5
 // @reversion: last revised by Buckychen on 2021-07-01
 
 #include "freepainting.h"
 
-// global variable
-static POINT    point_curr_begin;
-static POINT    point_curr_end;
-static Cache    color_linewidth_cache;             
-static Cache    color_linewidth_database;      
 static DrawingBoard board;
-HANDLE semaphore[2];
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR szCmdLine, _In_ int iCmdShow) {
   MSG msg;
@@ -21,8 +15,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
   static HBRUSH hBrush;
   static TCHAR szAppName[] = TEXT("FreePainting");
 
-  semaphore[0] = CreateSemaphore(NULL, 0, 1, NULL);
-  semaphore[1] = CreateSemaphore(NULL, 0, 1, NULL);
+  // Exit semaphore, priority higher
+  board.read_and_exit_handle[0] = CreateSemaphore(NULL, 0, 1, NULL);
+  //read_and_exit_handle[1] = CreateSemaphore(NULL, 0, 1, NULL); // Use timer semaphore as another timer way
+
+  // Auto reset, otherwise use SetWaitableTimer to reset
+  board.read_and_exit_handle[1] = CreateWaitableTimer(NULL, FALSE, NULL);
+  // Call timer after one second
+  LARGE_INTEGER timer_unit_per_second;
+  timer_unit_per_second.QuadPart = 10000000;
+  SetWaitableTimer(board.read_and_exit_handle[1], &timer_unit_per_second, 10 * 1000, NULL, NULL, FALSE);
 
   // Read file thread begin
   HANDLE thread_h;
@@ -63,8 +65,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     DispatchMessage(&msg);
   }
 
-  CloseHandle(semaphore[0]);
-  CloseHandle(semaphore[1]);
+  CloseHandle(board.read_and_exit_handle[0]);
+  CloseHandle(board.read_and_exit_handle[1]);
   CloseHandle(thread_h);
 
   return msg.wParam;  
@@ -74,18 +76,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 unsigned int WINAPI ThreadReadXmlFile(void *pointer_parm) {
   while (TRUE)
   {
-    int semaphore_signal = WaitForMultipleObjects(2, semaphore, FALSE, INFINITE);
-    if (semaphore_signal == WAIT_OBJECT_0)
-    {
-      ErrorShow(ReadXmlFile(board, color_linewidth_database, color_linewidth_cache));
-    }
-    else if (semaphore_signal == WAIT_OBJECT_0 + 1)
+    int read_and_exit_event = WaitForMultipleObjects(2, board.read_and_exit_handle, FALSE, INFINITE);
+    if (read_and_exit_event == WAIT_OBJECT_0)
     {
       break;
     }
-    else
+    // Two kind of timer
+    else if (read_and_exit_event == WAIT_OBJECT_0 + 1)
     {
-      ErrorShow(ERROR_HANDLE_TIME);
+      ErrorShow(ReadXmlFile(board, board.color_linewidth_database, board.color_linewidth_cache));
+    }
+    else if(read_and_exit_event == WAIT_FAILED)
+    {
+      ErrorShow(ERROR_HANDLE_WAITOBJECT);
       break;
     }
   }
@@ -93,7 +96,7 @@ unsigned int WINAPI ThreadReadXmlFile(void *pointer_parm) {
 }
 
 // Draw lines by using the data from xml files 
-void DrawingBoard::Drawing(HWND hwnd, HDC hdc, Cache& color_linewidth_database, Cache& color_linewidth_cache) {
+void DrawingBoard::Drawing(HWND hwnd, HDC hdc) {
   RECT rect;
   HPEN hpen;
   GetClientRect(hwnd, &rect);
@@ -102,19 +105,19 @@ void DrawingBoard::Drawing(HWND hwnd, HDC hdc, Cache& color_linewidth_database, 
   // Wait for the first read
   while (true)
   {
-    if (color_linewidth_cache.state != DataState::NO_UPDATE)
+    if (board.color_linewidth_cache.state != DataState::NO_UPDATE)
       break;
   }
 
-  // if there's no copy, create one and use data to assign to it
-  if (color_linewidth_cache.state == DataState::DELETED)
+  // If there's no copy, create one and use data to assign to it
+  if (board.color_linewidth_cache.state == DataState::DELETED)
   {
-    color_linewidth_cache = color_linewidth_database;
-    color_linewidth_cache.state = DataState::UPDATEED;
+    board.color_linewidth_cache = board.color_linewidth_database;
+    board.color_linewidth_cache.state = DataState::UPDATEED;
   }
 
   // Parse copy data and write into local variable
-  ErrorShow(ParsingDataCache(type_color, type_linewidth, color, linewidth, color_linewidth_cache.color_cache, color_linewidth_cache.linewidth_cache));
+  ErrorShow(ParsingDataCache(type_color, type_linewidth, color, linewidth, board.color_linewidth_cache.color_cache, board.color_linewidth_cache.linewidth_cache));
   DrawingParm curr_parm;
   curr_parm.point_begin = point_begin;
   curr_parm.point_end = point_end;
@@ -158,26 +161,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
   switch (message)
   {
   case WM_CREATE:
-    ReleaseSemaphore(semaphore[0], 1, NULL);
-    SetTimer(hwnd, TIMER_READ_ID, 10 * 1000, NULL);
+    //ReleaseSemaphore(semaphore[0], 1, NULL);
+    //SetTimer(hwnd, NULL, 10 * 1000, NULL);
     return 0;
   case WM_LBUTTONDOWN:
-    point_curr_begin.x = LOWORD(lParam);
-    point_curr_begin.y   = HIWORD(lParam);
+    board.point_curr_begin.x = LOWORD(lParam);
+    board.point_curr_begin.y   = HIWORD(lParam);
     return 0;
   case WM_LBUTTONUP:
-    point_curr_end.x = LOWORD(lParam);
-    point_curr_end.y   = HIWORD(lParam);
+    board.point_curr_end.x = LOWORD(lParam);
+    board.point_curr_end.y   = HIWORD(lParam);
     InvalidateRect(hwnd, NULL, TRUE);
     return 0;
-  case WM_TIMER:
-    ReleaseSemaphore(semaphore[0], 1, NULL);
+  //case WM_TIMER:
+    //ReleaseSemaphore(semaphore[1], 1, NULL);
   case WM_PAINT:
     hdc = BeginPaint(hwnd, &ps);
     if (board.GetClear() == false)
     {
-      board.SetCurrPoint(point_curr_begin, point_curr_end);
-      board.Drawing(hwnd, hdc, color_linewidth_database, color_linewidth_cache);
+      board.SetCurrPoint();
+      board.Drawing(hwnd, hdc);
     }
     else
     {
@@ -233,7 +236,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
     return 0;
   case WM_DESTROY:
     // Tell the child thread to exit
-    ReleaseSemaphore(semaphore[1], 1, NULL);
+    ReleaseSemaphore(board.read_and_exit_handle[0], 1, NULL);
     PostQuitMessage(0);
     return 0;
   }
