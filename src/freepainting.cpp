@@ -1,8 +1,8 @@
 // @brief: main file
 // @copyright: Copyright 2021 by Buckychen. All rights reserved
 // @birth: created by Buckychen on 2021-06-12
-// @version: v2.5
-// @reversion: last revised by Buckychen on 2021-07-01
+// @version: v2.6
+// @reversion: last revised by Buckychen on 2021-07-02
 
 #include "freepainting.h"
 
@@ -15,21 +15,24 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
   static HBRUSH hBrush;
   static TCHAR szAppName[] = TEXT("FreePainting");
 
+  // 1. Thread pool way:
   // Exit semaphore, priority higher
   board.read_and_exit_handle[0] = CreateSemaphore(NULL, 0, 1, NULL);
-  //read_and_exit_handle[1] = CreateSemaphore(NULL, 0, 1, NULL); // Use timer semaphore as another timer way
-
   // Auto reset, otherwise use SetWaitableTimer to reset
   board.read_and_exit_handle[1] = CreateWaitableTimer(NULL, FALSE, NULL);
+  board.thread_pool = CreateThreadpoolWork(ThreadPoolReadXmlFile, NULL, NULL);
+  SubmitThreadpoolWork(board.thread_pool);
+
   // Call timer after one second
   LARGE_INTEGER timer_unit_per_second;
   timer_unit_per_second.QuadPart = 10000000;
   SetWaitableTimer(board.read_and_exit_handle[1], &timer_unit_per_second, 10 * 1000, NULL, NULL, FALSE);
 
+  // 2. Thread way:
   // Read file thread begin
-  HANDLE thread_h;
-  unsigned thread_id;
-  thread_h = (HANDLE)_beginthreadex(NULL, 0, ThreadReadXmlFile, NULL, 0, &thread_id);
+  //HANDLE thread_h;
+  //unsigned thread_id;
+  //thread_h = (HANDLE)_beginthreadex(NULL, 0, ThreadReadXmlFile, NULL, 0, &thread_id);
 
   LoadMenu(hInstance, TEXT("Menu"));
   hBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
@@ -65,15 +68,45 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     DispatchMessage(&msg);
   }
 
-  CloseHandle(board.read_and_exit_handle[0]);
-  CloseHandle(board.read_and_exit_handle[1]);
-  CloseHandle(thread_h);
+  // Use false to wait for all works in pool to be done
+  WaitForThreadpoolWorkCallbacks(board.thread_pool, false);
+  CloseThreadpoolWork(board.thread_pool);
 
+  //CloseHandle(thread_h);
+  board.CloseBoardHandle();
+  
   return msg.wParam;  
 } 
 
+// 1. Thread pool way:
 // Use semaphore to read xml files and exit thread
-unsigned int WINAPI ThreadReadXmlFile(void *pointer_parm) {
+void WINAPI ThreadPoolReadXmlFile(PTP_CALLBACK_INSTANCE instance_pointer, PVOID context,
+  PTP_WORK Work)
+{
+  while (TRUE)
+  {
+    int read_and_exit_event = WaitForMultipleObjects(2, board.read_and_exit_handle, FALSE, INFINITE);
+    if (read_and_exit_event == WAIT_OBJECT_0)
+    {
+      break;
+    }
+    // Two kind of timer
+    else if (read_and_exit_event == WAIT_OBJECT_0 + 1)
+    {
+      ErrorShow(ReadXmlFile(board, board.color_linewidth_database, board.color_linewidth_cache));
+    }
+    else if (read_and_exit_event == WAIT_FAILED)
+    {
+      ErrorShow(ERROR_HANDLE_WAITOBJECT);
+      break;
+    }
+  }
+  return;
+}
+
+// 2. Thread way:
+// Same function as ThreadPoolReadXmlFile
+unsigned int WINAPI ThreadReadXmlFile(void* pointer_parm) {
   while (TRUE)
   {
     int read_and_exit_event = WaitForMultipleObjects(2, board.read_and_exit_handle, FALSE, INFINITE);

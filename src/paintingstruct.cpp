@@ -21,6 +21,10 @@ void DrawingBoard::ClearDrawing() {
   return;
 }
 
+void DrawingBoard::CloseBoardHandle() {
+  CloseHandle(read_and_exit_handle[0]);
+  CloseHandle(read_and_exit_handle[1]);
+}
 Cache::Cache() {
   state = DataState::NO_UPDATE;
   color_cache.clear();

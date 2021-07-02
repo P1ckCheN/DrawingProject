@@ -1,8 +1,8 @@
 // @brief: class declaration
 // @copyright: Copyright 2021 by Buckychen. All rights reserved
 // @birth: created by Buckychen on 2021-06-12
-// @version: v2.5
-// @reversion: last revised by Buckychen on 2021-06-30
+// @version: v2.6
+// @reversion: last revised by Buckychen on 2021-07-02
 
 #ifndef PAINTINGSTRUCT_H__
 #define PAINTINGSTRUCT_H__
@@ -93,8 +93,9 @@ private:
   std::vector<DrawingParm> drawing_parm;   
 
 public:
-  POINT point_curr_begin;
+  PTP_WORK thread_pool;
   POINT point_curr_end;
+  POINT point_curr_begin;
   Cache color_linewidth_cache;
   Cache color_linewidth_database;
   HANDLE read_and_exit_handle[2];
@@ -103,6 +104,7 @@ public:
   DrawingBoard();
   ~DrawingBoard();
   void ClearDrawing();
+  void CloseBoardHandle();
   inline bool GetClear() { return flag_clear; }
   inline void SetClear() { flag_clear = true; }
   inline void SetType(ShapeParm shape) { type_shape = shape; }
