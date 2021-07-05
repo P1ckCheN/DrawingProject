@@ -151,6 +151,7 @@
     <ClInclude Include="include\paintingstruct.h" />
     <ClInclude Include="include\parsingxml.h" />
     <ClInclude Include="include\Resource.h" />
+    <ClInclude Include="include\threadpool.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DrawingProject.rc" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\freepainting.cpp" />
     <ClCompile Include="src\paintingstruct.cpp" />
     <ClCompile Include="src\parsingxml.cpp" />
+    <ClCompile Include="src\threadpool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

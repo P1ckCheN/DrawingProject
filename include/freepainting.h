@@ -24,18 +24,10 @@
 
 // within this project
 #include "Resource.h" 
+#include "threadpool.h"
 #include "parsingxml.h"
 #include "errorhandle.h"
 #include "freepainting.h"
 #include "paintingstruct.h"
   
-#define TIMER_READ_ID  1      // timer id
-
-unsigned int WINAPI ThreadReadXmlFile(void* pointer_parm);
-
-void WINAPI ThreadPoolReadXmlFile(PTP_CALLBACK_INSTANCE instance_pointer, PVOID context,
-  PTP_WORK Work);
-
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
 #endif // !FREEPAINTING_H__

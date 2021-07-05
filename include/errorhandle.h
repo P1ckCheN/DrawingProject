@@ -9,16 +9,30 @@
 #ifndef ERRORHANDLE_H__
 #define ERRORHANDLE_H__
 
-#define SUCCESS 0    
-#define ERROR_XML_PATH 1    
-#define ERROR_XML_CONFIGURE 2    
-#define ERROR_EMPTY_COLOR 3   
-#define ERROR_EMPTY_LINEWIDTH 4  
-#define ERROR_PARSING_DATA 5   
-#define ERROR_REGISTER_CLASS 6    
-#define ERROR_HANDLE_TIME 7    
+#define SUCCESS                 0    
+#define ERROR_XML_PATH          1    
+#define ERROR_XML_CONFIGURE     2    
+#define ERROR_EMPTY_COLOR       3   
+#define ERROR_EMPTY_LINEWIDTH   4  
+#define ERROR_PARSING_DATA      5   
+#define ERROR_REGISTER_CLASS    6    
+#define ERROR_HANDLE_TIME       7    
 #define ERROR_HANDLE_WAITOBJECT 8
 
-void ErrorShow(int error_code);
+// Define the error type and print into message box
+// Example
+//  Error::ErrorShow(ERROR_MASSAGE);
+class Error {
+public:
+  static Error* error_type;
+  static Error* GetErrorType() {
+    return error_type;
+  }
+  static void ErrorShow(int error_code) {
+    return error_type->ErrorPrint(error_code);
+  }
+  
+  void ErrorPrint(int error_code);
+};
 
 #endif // !ERRORHANDLE_H__

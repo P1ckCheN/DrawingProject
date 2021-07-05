@@ -6,7 +6,9 @@
 
 #include "errorhandle.h"
 
-void ErrorShow(int error_code)
+Error* Error::error_type = nullptr;
+
+void Error::ErrorPrint(int error_code)
 {  
   TCHAR szAppName[] = TEXT("FreePainting");
   switch (error_code)
