@@ -1,4 +1,4 @@
-# FreePaintingTools v2.2
+# FreePaintingTools v3.0
 
 ## Functions：
 1. Draw different shapes include **line**, **rectangle** and **ellipse**.
@@ -46,3 +46,7 @@
 #### 2.2
 - Introduce database and cache tech;
 - Use ***Cache*** class to simulate database&cache.
+
+#### 3.0
+- Add thread pool mechanism, which will allocate the task more covienient;
+- Modify the class encapsulation.
