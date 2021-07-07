@@ -7,20 +7,22 @@
 #ifndef PARSINGXML_H__
 #define PARSINGXML_H__
 
-#include "framework.h"
+//#include "framework.h"
 
 #include <windows.h>
 
 #include <string>
+#include <fstream>
 
 #include "paintingstruct.h"
+#include "tinyxml/tinyxml.h"
 
 void Transform(std::string& color_value_string, int* color_value);
 
 int ParsingDataCache(ColorParm in_color, LinewidthParm in_linewidth, int* out_color, int& out_linewidth,
   std::unordered_map<std::string, int*>& color_cache, std::unordered_map<std::string, int>& linewidth_cache);
 
-int ReadXmlFile(DrawingBoard& board, Cache& color_linewidth_database, Cache& color_linewidth_cache);
+int ReadXmlFile(DrawingBoard* board);
 
 #endif // !PARSINGXML_H__
 

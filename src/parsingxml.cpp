@@ -80,10 +80,19 @@ int ParsingDataCache(ColorParm in_color, LinewidthParm in_linewidth, int* out_co
   return SUCCESS;
 }
 
-
-int ReadXmlFile(DrawingBoard& board, Cache& color_linewidth_database, Cache& color_linewidth_cache)
+//int count = 0;
+int ReadXmlFile(DrawingBoard* board)
 {
-  board.color_linewidth_database.state = DataState::NO_UPDATE;
+  //Varifying the timer 
+  /*std::ofstream outfile;
+  SYSTEMTIME sys;
+  outfile.open("doc/record.txt", std::ios::app);
+  outfile << "Times " << count++ << " :"<< std::endl;
+  GetLocalTime(&sys);
+  outfile << sys.wMinute << "'" << sys.wSecond << std::endl << std::endl;
+  outfile.close();*/
+
+  board->color_linewidth_database.state = DataState::NO_UPDATE;
 
   std::string color_value_string;
   std::string linewidth_value_string;
@@ -115,10 +124,10 @@ int ReadXmlFile(DrawingBoard& board, Cache& color_linewidth_database, Cache& col
     color_value_string = xml_color_name->NextSiblingElement("value")->GetText();
     Transform(color_value_string, color_transform);
 
-    board.color_linewidth_database.color_cache[s] = new int[3];
+    board->color_linewidth_database.color_cache[s] = new int[3];
     for (int i = 0; i < 3; i++)
     {
-      board.color_linewidth_database.color_cache[s][i] = color_transform[i];
+      board->color_linewidth_database.color_cache[s][i] = color_transform[i];
     }
 
     xml_color = xml_color->NextSiblingElement();
@@ -130,24 +139,24 @@ int ReadXmlFile(DrawingBoard& board, Cache& color_linewidth_database, Cache& col
   {
     TiXmlElement* xml_linewidth_name = xml_linewidth->FirstChildElement("name");
     std::string s = xml_linewidth_name->GetText();
-    board.color_linewidth_database.linewidth_cache[s] = std::stoi(xml_linewidth_name->NextSiblingElement("value")->GetText());
+    board->color_linewidth_database.linewidth_cache[s] = std::stoi(xml_linewidth_name->NextSiblingElement("value")->GetText());
     xml_linewidth = xml_linewidth->NextSiblingElement();
   }
 
   // Judge the error
-  if (board.color_linewidth_database.color_cache.empty())
+  if (board->color_linewidth_database.color_cache.empty())
   {
     return ERROR_EMPTY_COLOR;
   }
-  if (board.color_linewidth_database.linewidth_cache.empty())
+  if (board->color_linewidth_database.linewidth_cache.empty())
   {
     return ERROR_EMPTY_LINEWIDTH;
   }
 
   // if the data are updated, delete the copy
-  board.color_linewidth_database.state = DataState::UPDATEED;
-  board.color_linewidth_cache.state = DataState::DELETED;
-  board.color_linewidth_cache.deletecache();
-  board.SetRead(true);
+  board->color_linewidth_database.state = DataState::UPDATEED;
+  board->color_linewidth_cache.state = DataState::DELETED;
+  board->color_linewidth_cache.deletecache();
+  board->SetRead(true);
   return SUCCESS;
 }

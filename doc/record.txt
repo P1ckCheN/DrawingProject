@@ -1,0 +1,27 @@
+Times 0 :
+5'18
+
+Times 1 :
+5'21
+
+Times 2 :
+5'28
+
+Times 3 :
+5'38
+
+Times 0 :
+5'54
+
+Times 1 :
+5'58
+
+Times 0 :
+8'10
+
+Times 0 :
+11'3
+
+Times 1 :
+11'7
+

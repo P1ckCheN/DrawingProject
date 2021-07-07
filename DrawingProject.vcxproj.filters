@@ -33,7 +33,19 @@
     <ClInclude Include="include\paintingstruct.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\taskqueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\threadexcution.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\threadpool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\taskobject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\taskabstract.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -64,6 +76,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\threadpool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\taskqueue.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\threadexcution.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\taskobject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

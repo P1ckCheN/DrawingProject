@@ -151,6 +151,10 @@
     <ClInclude Include="include\paintingstruct.h" />
     <ClInclude Include="include\parsingxml.h" />
     <ClInclude Include="include\Resource.h" />
+    <ClInclude Include="include\taskabstract.h" />
+    <ClInclude Include="include\taskobject.h" />
+    <ClInclude Include="include\taskqueue.h" />
+    <ClInclude Include="include\threadexcution.h" />
     <ClInclude Include="include\threadpool.h" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +169,9 @@
     <ClCompile Include="src\freepainting.cpp" />
     <ClCompile Include="src\paintingstruct.cpp" />
     <ClCompile Include="src\parsingxml.cpp" />
+    <ClCompile Include="src\taskobject.cpp" />
+    <ClCompile Include="src\taskqueue.cpp" />
+    <ClCompile Include="src\threadexcution.cpp" />
     <ClCompile Include="src\threadpool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

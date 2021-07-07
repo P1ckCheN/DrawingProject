@@ -7,31 +7,21 @@
 #include "freepainting.h"
 
 static DrawingBoard board;
-void TaskReadXmlFile(void* pointer_param);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR szCmdLine, _In_ int iCmdShow) {
+  
+  // Greate task object and thread pool
+  TaskObject* task_object = new TaskObject;
+  ThreadPool* thread_pool_instance = ThreadPool::GetSingleton();
+  // Submit task into thread pool, along with the parameters
+  thread_pool_instance->SubmitTaskIntoThreadPool(task_object, (void*)&board);
+  
   MSG msg;
   HWND hwnd;
   WNDCLASS wndclass;
-  ThreadPool threadpool;
   static HBRUSH hBrush;
   static TCHAR szAppName[] = TEXT("FreePainting");
-
-  // Exit semaphore should have higher priority
-  board.read_and_exit_handle[0] = CreateSemaphore(NULL, 0, 1, NULL);
-  // Auto reset timer, otherwise use SetWaitableTimer to reset
-  board.read_and_exit_handle[1] = CreateWaitableTimer(NULL, FALSE, NULL);
-  
-  // Create a thread pool of 2 threads, submit a task into one of them
-  ThreadPool::CreateThreadPool(2);
-  ThreadPool::SubmitTaskIntoThreadPool(TaskReadXmlFile, NULL);
-
-  // Call timer after one second
-  LARGE_INTEGER timer_unit_per_second;
-  timer_unit_per_second.QuadPart = 10000000;
-  SetWaitableTimer(board.read_and_exit_handle[1], &timer_unit_per_second, 10 * 1000, NULL, NULL, FALSE);
-
   // Window's propertiy
   LoadMenu(hInstance, TEXT("Menu"));
   hBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
@@ -66,35 +56,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     DispatchMessage(&msg);
   }
 
-  ThreadPool::CleanThreadPool();
-  board.CloseBoardHandle();
-  //threadpool.ClearThreadPool();
+  // Before main thread exit, children thread must exit. 
+  delete task_object;
+  delete thread_pool_instance;
   return msg.wParam;  
 } 
-
-// Task which will submit into the thread pool
-void TaskReadXmlFile(void* pointer_param) {
-  while (TRUE)
-  {
-    int read_and_exit_event = WaitForMultipleObjects(2, board.read_and_exit_handle, FALSE, INFINITE);
-    if (read_and_exit_event == WAIT_OBJECT_0)
-    {
-      break;
-    }
-    // Two kind of timer
-    else if (read_and_exit_event == WAIT_OBJECT_0 + 1)
-    {
-      Error::ErrorShow(ReadXmlFile(board, board.color_linewidth_database, board.color_linewidth_cache));
-    }
-    else if (read_and_exit_event == WAIT_FAILED)
-    {
-      Error::ErrorShow(ERROR_HANDLE_WAITOBJECT);
-      break;
-    }
-  }
-  return;
-}
-
 
 // Draw lines by using the data from xml files 
 void DrawingBoard::Drawing(HWND hwnd, HDC hdc) {
@@ -162,8 +128,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
   switch (message)
   {
   case WM_CREATE:
-    //ReleaseSemaphore(semaphore[0], 1, NULL);
-    //SetTimer(hwnd, NULL, 10 * 1000, NULL);
     return 0;
   case WM_LBUTTONDOWN:
     board.point_curr_begin.x = LOWORD(lParam);
@@ -234,7 +198,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
     }
     return 0;
   case WM_DESTROY:
-    ReleaseSemaphore(board.read_and_exit_handle[0], 1, NULL);
     PostQuitMessage(0);
     return 0;
   }

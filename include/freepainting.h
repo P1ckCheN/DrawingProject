@@ -7,7 +7,7 @@
 #define FREEPAINTING_H__
 
 // related head files
-#include "framework.h"      
+//#include "framework.h"      
 
 // C lib
 #include <windows.h>    
@@ -23,6 +23,7 @@
 #include "tinyxml/tinyxml.h" 
 
 // within this project
+//#include "taskabstract.h"
 #include "Resource.h" 
 #include "threadpool.h"
 #include "parsingxml.h"
