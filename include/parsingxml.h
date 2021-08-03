@@ -7,8 +7,6 @@
 #ifndef PARSINGXML_H__
 #define PARSINGXML_H__
 
-//#include "framework.h"
-
 #include <windows.h>
 
 #include <string>

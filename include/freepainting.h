@@ -6,24 +6,13 @@
 #ifndef FREEPAINTING_H__
 #define FREEPAINTING_H__
 
-// related head files
-//#include "framework.h"      
-
-// C lib
 #include <windows.h>    
 #include <process.h>
-
-// C++ lib
 #include <string> 
 #include <vector>
 #include <atomic>
 #include <unordered_map>
-
-// other lib 
 #include "tinyxml/tinyxml.h" 
-
-// within this project
-//#include "taskabstract.h"
 #include "Resource.h" 
 #include "threadpool.h"
 #include "parsingxml.h"

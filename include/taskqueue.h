@@ -16,55 +16,44 @@ using TaskFunction = void(*)(void*);
 // Task unit item
 class TaskToExcution {
 public:
-  TaskFunction task_function;
-  void *task_param;
+  TaskFunction task_function_;
+  void *task_param_;
 public:
-  TaskToExcution(TaskFunction task_function_, void* task_param_ = NULL) {
-    task_function = task_function_;
-    task_param = task_param_;
+  TaskToExcution(TaskFunction task_function, void* task_param = NULL) {
+    task_function_ = task_function;
+    task_param_ = task_param;
   }
 };
 
-// Package task object & parameters
 class TaskObjectItem {
 public:
-  // Abstract class pointer
-  TaskAbstract* task_process;
-  void* task_param;
-  TaskObjectItem(TaskAbstract* task_process_, void* task_param_ = NULL) {
-    task_process = task_process_;
-    task_param = task_param_;
+  TaskAbstract* task_process_;
+  void* task_param_;
+  TaskObjectItem(TaskAbstract* task_process, void* task_param = NULL) {
+    task_process_ = task_process;
+    task_param_ = task_param;
   }
 };
 
 class TaskQueue {
 public:
-  // Task queue singeleton
   static TaskQueue *Instance();
   ~TaskQueue();
-
   void Lock();
   void Unlock();
-
   void Push(TaskAbstract* task_process, void* task_param = NULL);
   void Pop();
-
   size_t Size();
   bool isEmpty();
-
   TaskToExcution *Front();
 
 private:
   TaskQueue();
-  // convert and handle the task object
   static void TaskConvert(void* param);
 
-private:
-  static TaskQueue *task_queue_singleton;
-  std::queue<TaskToExcution*> task_queue;
-  HANDLE task_queue_mutex;
-
-  
+  static TaskQueue *task_queue_singleton_;
+  std::queue<TaskToExcution*> task_queue_;
+  HANDLE task_queue_mutex_;
 };
 
 #endif // !TASK_QUEUE_H__

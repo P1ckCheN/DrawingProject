@@ -5,6 +5,7 @@
 // @reversion: last revised by Buckychen on 2021-06-30
 
 #include <windows.h>
+#include <assert.h>
 
 #ifndef ERRORHANDLE_H__
 #define ERRORHANDLE_H__
@@ -19,17 +20,14 @@
 #define ERROR_HANDLE_TIME       7    
 #define ERROR_HANDLE_WAITOBJECT 8
 
-// Define the error type and print into message box
-// Example
-//  Error::ErrorShow(ERROR_MASSAGE);
 class Error {
-public:
-  static Error* error_type;
+ public:
+  static Error* error_type_;
   static Error* GetErrorType() {
-    return error_type;
+    return error_type_;
   }
   static void ErrorShow(int error_code) {
-    return error_type->ErrorPrint(error_code);
+    return error_type_->ErrorPrint(error_code);
   }
   
   void ErrorPrint(int error_code);

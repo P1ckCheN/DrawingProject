@@ -8,7 +8,7 @@
 
 class TaskAbstract {
 public:
-  virtual ~TaskAbstract() {}
+  virtual ~TaskAbstract() { }
   // Task processing interface
   virtual void TaskProcess(void* task_param) = 0;
 };

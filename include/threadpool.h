@@ -13,40 +13,29 @@
 #include "taskqueue.h"
 #include "threadexcution.h"
 
-// Simulate the thread pool function
-// Create thread pool of given size, it will be a container of threads
-// Example:
-class ThreadPool {
-public:
-  TaskQueue* task_queue_singleton;
-  // Thread handle of processing threads in pool
-  static HANDLE thread_process_semaphore;
-  // Process thread
-  HANDLE task_process;
-  // Thread pool mutex
-  HANDLE thread_pool_mutex;
-  // Clear event
-  HANDLE thread_pool_delete;
-  // Clear done event
-  HANDLE thread_pool_complete_delete;
-  // Singleton 
-  static ThreadPool* thread_pool_singleton;
-  // Thread pool of vector
-  std::vector<ThreadExcution* > thread_pool;
 
-public:
+class ThreadPool {
+ public:
   ThreadPool();
   ~ThreadPool();
   void ExcuteTask();
   int GetThreadPoolSize();
   void CreateThreadPool(int thread_num);
   void SubmitTaskIntoThreadPool(TaskObject* task_object, void* task_param);
-
   static ThreadPool* GetSingleton();  
   static void ThreadWorkFunction(void* param);
 
-private:
-  int initial_size;
+  TaskQueue* task_queue_singleton_;
+  HANDLE task_process_;
+  HANDLE thread_pool_mutex_;
+  HANDLE thread_pool_delete_;
+  HANDLE thread_pool_complete_delete_;
+  std::vector<ThreadExcution* > thread_pool_;
+  static ThreadPool* thread_pool_singleton_;
+  static HANDLE thread_process_semaphore_;
+
+ private:
+  int initial_size_;
   int GetProcessorNum();
 };
 

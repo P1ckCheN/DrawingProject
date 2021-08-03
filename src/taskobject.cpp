@@ -5,5 +5,5 @@
 // @reversion: last revised by Buckychen on 2021-07-07
 #include "taskobject.h"
 
-HANDLE TaskObject::read_and_exit_handle[2] = { 0, 0 };
+HANDLE TaskObject::read_and_exit_handle_[2] = { 0, 0 };
 

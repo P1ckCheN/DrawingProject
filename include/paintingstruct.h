@@ -8,13 +8,10 @@
 #define PAINTINGSTRUCT_H__
 
 #include <windows.h>
-
 #include <vector>
 #include <unordered_map>
-
 #include "errorhandle.h"
 
-// enum type
 enum class ShapeParm {
   TYPE_LINE,                         
   TYPE_RECT,                          
@@ -33,14 +30,12 @@ enum class LinewidthParm {
   TYPE_THICK                         
 };
 
-enum class DataState
-{
+enum class DataState {
   NO_UPDATE,                         
   UPDATEED,                         
   DELETED                            
 };
 
-// store history parameters
 struct DrawingParm {
   POINT point_begin;                 
   POINT point_end;                 
@@ -49,75 +44,54 @@ struct DrawingParm {
   int linewidth_parm;                
 };
 
-// Store the data of parsing xml files
-// Example:
-//  Cache* cache_sample = new Cache();
-//  Cache* cache_sample_copy;
-//  cache_sample_copy = cache_sample;
-//  cache_sample.deletecache();
 class Cache {
-public:
-  DataState state;                     
-  std::unordered_map<std::string, int*> color_cache;     
-  std::unordered_map<std::string, int > linewidth_cache;  
+ public:
+  DataState state_;                     
+  std::unordered_map<std::string, int*> color_cache_;     
+  std::unordered_map<std::string, int > linewidth_cache_;  
 
-public:
   Cache();                        
   ~Cache() {}                         
   void deletecache();                     
   Cache& operator=(const Cache& cache);           
 };
 
-// Operate the draw object, and store information
-// inlcuding drawing parameters, drawing points, clearing, setting color...
-// Example:
-//  DrawingBoard* board = new DrawingBoard();
-//  board.SetType(ShapeParm::TYPE_LINE);
-//  board.SetColor(ColorParm::TYPE_RED);
-//  board.SetLinewidthParm(LinewidhtParm::TYPE_THIN);
-//  board.ClearDrawing();
-//  Cache board.color_linewidth_cache, board.color_linewidth_database;
-//  ...
-//  board.Drawing(hwnd, hdc, database, cache);
 class DrawingBoard {
-private:
-  int color[3];
-  int linewidth;
-  bool flag_clear;                         
-  bool flag_read_xml_file;                                  
-  POINT point_begin;                       
-  POINT point_end;                        
-  ShapeParm type_shape;                    
-  ColorParm type_color;                     
-  LinewidthParm type_linewidth;            
-  std::vector<DrawingParm> drawing_parm;   
-
-public:
-  PTP_WORK thread_pool;
-  POINT point_curr_end;
-  POINT point_curr_begin;
-  Cache color_linewidth_cache;
-  Cache color_linewidth_database;
-  HANDLE read_and_exit_handle[2];
-
-public:
+ public:
   DrawingBoard();
   ~DrawingBoard();
   void ClearDrawing();
   void CloseBoardHandle();
-  inline bool GetClear() { return flag_clear; }
-  inline void SetClear() { flag_clear = true; }
-  inline void SetType(ShapeParm shape) { type_shape = shape; }
-  inline void SetColor(ColorParm color) { type_color = color; }
-  inline void SetRead(bool flag) { flag_read_xml_file = flag; }
-  inline void SetLinewidth(LinewidthParm linewidth) { 
-    type_linewidth = linewidth; 
-  }
-  inline void SetCurrPoint() {
-    point_begin = point_curr_begin;
-    point_end = point_curr_end;
-  }
   void Drawing(HWND hwnd, HDC hdc);
+
+  inline bool GetClear() { return flag_clear_; }
+  inline void SetClear() { flag_clear_ = true; }
+  inline void SetType(ShapeParm shape) { type_shape_ = shape; }
+  inline void SetColor(ColorParm color) { type_color_ = color; }
+  inline void SetRead(bool flag) { flag_read_xml_file_ = flag; }
+  inline void SetLinewidth(LinewidthParm linewidth) { type_linewidth_ = linewidth; }
+  inline void SetCurrPoint() {
+    point_begin_ = point_curr_begin_;
+    point_end_ = point_curr_end_;
+  }
+
+  POINT point_curr_end_;
+  POINT point_curr_begin_;
+  Cache color_linewidth_cache_;
+  Cache color_linewidth_database_;
+  HANDLE read_and_exit_handle_[2];
+
+ private:
+  int color_[3];
+  int linewidth_;
+  bool flag_clear_;
+  bool flag_read_xml_file_;
+  POINT point_begin_;
+  POINT point_end_;
+  ShapeParm type_shape_;
+  ColorParm type_color_;
+  LinewidthParm type_linewidth_;
+  std::vector<DrawingParm> drawing_parm_;
 };
 
 #endif // ! PAINTINGSTRUCT_H__

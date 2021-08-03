@@ -18,26 +18,26 @@ enum class TaskType{
 
 class TaskObject : public TaskAbstract {
 public:
-  static const TaskType task_type = TaskType::IO_INTENSIVE;
-  static HANDLE read_and_exit_handle[2];
+  static const TaskType task_type_ = TaskType::IO_INTENSIVE;
+  static HANDLE read_and_exit_handle_[2];
 public:
   TaskObject() {
-    read_and_exit_handle[0] = CreateSemaphore(NULL, 0, 1, NULL);
-    read_and_exit_handle[1] = CreateWaitableTimer(NULL, FALSE, NULL);
+    read_and_exit_handle_[0] = CreateSemaphore(NULL, 0, 1, NULL);
+    read_and_exit_handle_[1] = CreateWaitableTimer(NULL, FALSE, NULL);
     LARGE_INTEGER timer_unit_per_second;
     timer_unit_per_second.QuadPart = 10000000;
     // Call timer after one second
-    SetWaitableTimer(read_and_exit_handle[1], &timer_unit_per_second, 10 * 1000, NULL, NULL, FALSE);
+    SetWaitableTimer(read_and_exit_handle_[1], &timer_unit_per_second, 10 * 1000, NULL, NULL, FALSE);
   }
   ~TaskObject() {
-    ReleaseSemaphore(read_and_exit_handle[0], 1, NULL);
-    CloseHandle(read_and_exit_handle[0]);
-    CloseHandle(read_and_exit_handle[1]);
+    ReleaseSemaphore(read_and_exit_handle_[0], 1, NULL);
+    CloseHandle(read_and_exit_handle_[0]);
+    CloseHandle(read_and_exit_handle_[1]);
   }
   void TaskProcess(void* task_param) {
     while (true) {
       DWORD error_code;
-      int read_and_exit_event = WaitForMultipleObjects(2, read_and_exit_handle, FALSE, INFINITE);
+      int read_and_exit_event = WaitForMultipleObjects(2, read_and_exit_handle_, FALSE, INFINITE);
       error_code = GetLastError();
       if (read_and_exit_event == WAIT_OBJECT_0) {
         break;
@@ -53,30 +53,5 @@ public:
     return;
   }
 };
-
-
-//class Task {
-//public:
-//  static HANDLE read_and_exit_handle[2];
-//public:
-//  static void TaskReadXmlFile(void* param) {
-//    while (true) {
-//      DWORD error_code;
-//      int read_and_exit_event = WaitForMultipleObjects(2, read_and_exit_handle, FALSE, INFINITE);
-//      error_code = GetLastError();
-//      if (read_and_exit_event == WAIT_OBJECT_0) {
-//        break;
-//      }
-//      else if (read_and_exit_event == WAIT_OBJECT_0 + 1) {
-//        Error::ErrorShow(ReadXmlFile((DrawingBoard*)param));
-//      }
-//      else if (read_and_exit_event == WAIT_FAILED) {
-//        Error::ErrorShow(ERROR_HANDLE_WAITOBJECT);
-//        break;
-//      }
-//    }
-//    return;
-//  }
-//};
 
 #endif

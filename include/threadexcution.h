@@ -13,40 +13,31 @@
 
 using TaskFunction = void(*)(void*);
 
-// Using function object 
-
-
-// Using function name
-
-
 class ThreadExcution {
-public:
+ public:
   ThreadExcution();
-  ThreadExcution(TaskAbstract* task_process, void* task_param = NULL);
-  ThreadExcution(TaskFunction task_function, void* task_param = NULL);
-
+  explicit ThreadExcution(TaskAbstract* task_process, void* task_param = NULL);
+  explicit ThreadExcution(TaskFunction task_function, void* task_param = NULL);
   ~ThreadExcution();
   void Run();
   bool Start();
   unsigned int GetThreadId() const;
   HANDLE GetThreadHandle() const;
-private:
   static unsigned int WINAPI ThreadFunction(void* param);
-private:
-  unsigned int thread_id;
-  HANDLE thread_handle;
-  bool flag_task;
-  // Task submit and excute
+
+ private:
   struct TaskObjectItem {
     TaskAbstract* task_abstract;
     void* task_param;
-  }task_object_item;
-
-  // Task whitch control the pool
+  } task_object_item_;
   struct TaskFunctionItem {
     TaskFunction task_function;
     void* task_param;
-  }task_function_item;
+  } task_function_item_;
+
+  unsigned int thread_id_;
+  HANDLE thread_handle_;
+  bool flag_task_;
 };
 
 #endif // !THREAD_EXCUTION_H__

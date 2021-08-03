@@ -6,52 +6,50 @@
 
 #include "errorhandle.h"
 
-Error* Error::error_type = nullptr;
+Error* Error::error_type_ = nullptr;
 
-void Error::ErrorPrint(int error_code)
-{  
+void Error::ErrorPrint(int error_code) {
   TCHAR szAppName[] = TEXT("FreePainting");
-  switch (error_code)
-  {
+  switch (error_code) {
     case SUCCESS:
       return;
     case ERROR_XML_PATH:
       MessageBox(NULL, TEXT("Cannot find xml file, error path!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_XML_CONFIGURE:
       MessageBox(NULL, TEXT("Configure file error!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_EMPTY_COLOR:
       MessageBox(NULL, TEXT("Cannot load color information!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_EMPTY_LINEWIDTH:
       MessageBox(NULL, TEXT("Cannot load linewidth information!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_PARSING_DATA:
       MessageBox(NULL, TEXT("Cannot parse parameters!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_REGISTER_CLASS:
-      MessageBox(NULL, TEXT("Error in registing class, Program requires Windows NT!"),
-        szAppName, MB_ICONERROR);
+      MessageBox(NULL, TEXT("Error in registing class, Requires Windows NT!"),
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_HANDLE_TIME:
       MessageBox(NULL, TEXT("Time out, Please check the program!"),
-        szAppName, MB_ICONERROR);
+                 szAppName, MB_ICONERROR);
       break;
     case ERROR_HANDLE_WAITOBJECT:
-      MessageBox(NULL, TEXT("Get event failed, please check the event handle!"),
-        szAppName, MB_ICONERROR);
+      MessageBox(NULL, TEXT("Get event failed, please check event handles!"),
+                 szAppName, MB_ICONERROR);
       break;
     default:
+      assert(false);
       break;
   }
-  if (error_code != SUCCESS)
-  {
+  if (error_code != SUCCESS) {
     exit(-1);
   }
   return;

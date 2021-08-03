@@ -7,38 +7,46 @@
 #include "paintingstruct.h"
 
 DrawingBoard::DrawingBoard():
-  flag_clear(false), flag_read_xml_file(false), color{ 0,0,0 }, linewidth(0), point_begin{ 0, 0 }, point_end{ 0, 0 },
-  type_shape(ShapeParm::TYPE_LINE), type_color(ColorParm::TYPE_RED), type_linewidth(LinewidthParm::TYPE_THIN) {
+  flag_clear_(false), 
+  flag_read_xml_file_(false), 
+  color_{ 0,0,0 }, 
+  linewidth_(0), 
+  point_begin_{ 0, 0 }, 
+  point_end_{ 0, 0 },
+  type_shape_(ShapeParm::TYPE_LINE), 
+  type_color_(ColorParm::TYPE_RED), 
+  type_linewidth_(LinewidthParm::TYPE_THIN) {
 }
 
 DrawingBoard::~DrawingBoard() {
-  drawing_parm.clear();
+  drawing_parm_.clear();
 }
 
 void DrawingBoard::ClearDrawing() {
-  flag_clear = false;
-  drawing_parm.clear();
+  flag_clear_ = false;
+  drawing_parm_.clear();
   return;
 }
 
 void DrawingBoard::CloseBoardHandle() {
-  CloseHandle(read_and_exit_handle[0]);
-  CloseHandle(read_and_exit_handle[1]);
+  CloseHandle(read_and_exit_handle_[0]);
+  CloseHandle(read_and_exit_handle_[1]);
 }
+
 Cache::Cache() {
-  state = DataState::NO_UPDATE;
-  color_cache.clear();
-  color_cache.clear();
+  state_ = DataState::NO_UPDATE;
+  color_cache_.clear();
+  color_cache_.clear();
 }
 
 void Cache::deletecache() {
-  state = DataState::DELETED;
-  color_cache.clear();
-  linewidth_cache.clear();
+  state_ = DataState::DELETED;
+  color_cache_.clear();
+  linewidth_cache_.clear();
 }
 
 Cache& Cache::operator=(const Cache& cache) {
-  color_cache = cache.color_cache;
-  linewidth_cache = cache.linewidth_cache;
+  color_cache_ = cache.color_cache_;
+  linewidth_cache_ = cache.linewidth_cache_;
   return *this;
 }

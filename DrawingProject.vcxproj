@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>include\;include\tinyxml\;src\;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>$(SolutionDir)ouput\</OutDir>
     <TargetName>freepainting</TargetName>
     <LibraryPath>$(SolutionDir)\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -147,7 +147,6 @@
   <ItemGroup>
     <ClInclude Include="include\errorhandle.h" />
     <ClInclude Include="include\freepainting.h" />
-    <ClInclude Include="include\framework.h" />
     <ClInclude Include="include\paintingstruct.h" />
     <ClInclude Include="include\parsingxml.h" />
     <ClInclude Include="include\Resource.h" />
